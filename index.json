@@ -235,13 +235,26 @@
       "description": "Removes server mute/deafen, moves you back if you get moved to another voice channel, and rejoins if you get disconnected. Needs Mute/Deafen/Move Members permissions.",
       "author": "You",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.0.1"
       },
       "versions": {
         "1.0.0": {
           "url": "https://msgledhill.github.io/Antiservermute/pool/dev.you.anti-server-mute@1.0.0.zip",
           "sha256": "f07fdb9a0cc358fb75b0ee08eeac62d5c8e1ff5ab1b3238e127df6bdcd4664cb",
           "size": 2056,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.1": {
+          "url": "https://msgledhill.github.io/Antiservermute/pool/dev.you.anti-server-mute@1.0.1.zip",
+          "sha256": "417bb7e9c1587dbf4a1dc4b3ed9c9e0ae92c3a941653042161ab4a9c7e0adfd1",
+          "size": 2099,
           "dependencies": {
             "valenced.api": {
               "version": ">=1"
