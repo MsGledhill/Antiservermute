@@ -36,6 +36,17 @@ function opt(key, fallback) {
   }
 }
 
+// Debug output: console + a popup (RN's global alert) so you can see it without adb
+function dbg(msg, force) {
+  const text = "[AntiServerMute] " + msg;
+  console.log(text);
+  if (force || opt("debug", true)) {
+    try {
+      alert(text);
+    } catch (e) {}
+  }
+}
+
 // ---- state ----
 const intendedChannel = new Map(); // guildId -> channel I deliberately chose
 const currentChannel = new Map(); // guildId -> channel I was last seen in
@@ -66,13 +77,16 @@ function allowCorrectiveMove() {
 function sendFix(guildId, userId, body) {
   const run = () => {
     lastRequestAt = Date.now();
-    RestAPI.patch({ url: `/guilds/${guildId}/members/${userId}`, body }).catch((err) => {
-      console.error(
-        "[AntiServerMute] correction failed" +
-          (err && err.status === 403 ? " (missing Mute/Deafen/Move Members permission)" : ""),
-        err,
-      );
-    });
+    dbg("sending " + JSON.stringify(body));
+    try {
+      Promise.resolve(RestAPI.patch({ url: `/guilds/${guildId}/members/${userId}`, body }))
+        .then(() => dbg("request OK"))
+        .catch((err) => {
+          dbg("request FAILED: status " + (err && err.status) + " " + (err && err.body && err.body.message), true);
+        });
+    } catch (e) {
+      dbg("request threw: " + e, true);
+    }
   };
 
   const wait = MIN_INTERVAL_MS - (Date.now() - lastRequestAt);
@@ -125,9 +139,12 @@ function onVoiceStateUpdates(e) {
   if (!me || !e || !e.voiceStates) return;
 
   for (const state of e.voiceStates) {
-    if (state.userId !== me.id || !state.guildId) continue;
+    const uid = state.userId || state.user_id;
+    const guildId = state.guildId || state.guild_id;
+    if (uid !== me.id || !guildId) continue;
 
-    const guildId = state.guildId;
+    state.channelId = state.channelId || state.channel_id || null;
+    dbg("my voice state: mute=" + state.mute + " deaf=" + state.deaf + " channel=" + state.channelId);
     const newChannel = state.channelId || null;
     const prevChannel = currentChannel.get(guildId) || null;
     currentChannel.set(guildId, newChannel);
@@ -174,7 +191,7 @@ export default plugin({
       .filter(([, v]) => !v)
       .map(([k]) => k);
     if (missing.length) {
-      console.error("[AntiServerMute] could not find: " + missing.join(", ") + " - plugin not started");
+      dbg("could not find: " + missing.join(", ") + " - plugin NOT started", true);
       dispatcher = null; // so stop() has nothing to clean up
       return;
     }
@@ -188,6 +205,7 @@ export default plugin({
     }
 
     dispatcher.subscribe("VOICE_STATE_UPDATES", onVoiceStateUpdates);
+    dbg("started (me=" + (UserStore.getCurrentUser() || {}).id + ", in VC: " + vc + ")");
     dispatcher.subscribe("VOICE_CHANNEL_SELECT", onVoiceChannelSelect);
 
     // Backup "I did this myself" detection, in case VOICE_CHANNEL_SELECT isn't dispatched
