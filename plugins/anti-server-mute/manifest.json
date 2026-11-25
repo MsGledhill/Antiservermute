@@ -4,16 +4,46 @@
   "name": "Anti Server Mute",
   "description": "Removes server mute/deafen, moves you back if you get moved to another voice channel, and rejoins if you get disconnected. Needs Mute/Deafen/Move Members permissions.",
   "author": "You",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "dependencies": {
-    "valenced.api": { "version": ">=1" },
-    "discord": { "version": "*" }
+    "valenced.api": {
+      "version": ">=1"
+    },
+    "discord": {
+      "version": "*"
+    }
   },
   "settings": [
-    { "key": "autoUnmute", "type": "switch", "label": "Auto-remove server mute", "default": true },
-    { "key": "autoUndeafen", "type": "switch", "label": "Auto-remove server deafen", "default": true },
-    { "key": "moveBack", "type": "switch", "label": "Move me back if I'm moved to another VC", "default": true },
-    { "key": "autoRejoin", "type": "switch", "label": "Rejoin my VC if I'm disconnected", "default": true }
+    {
+      "key": "autoUnmute",
+      "type": "switch",
+      "label": "Auto-remove server mute",
+      "default": true
+    },
+    {
+      "key": "autoUndeafen",
+      "type": "switch",
+      "label": "Auto-remove server deafen",
+      "default": true
+    },
+    {
+      "key": "moveBack",
+      "type": "switch",
+      "label": "Move me back if I'm moved to another VC",
+      "default": true
+    },
+    {
+      "key": "autoRejoin",
+      "type": "switch",
+      "label": "Rejoin my VC if I'm disconnected",
+      "default": true
+    },
+    {
+      "key": "debug",
+      "type": "switch",
+      "label": "Debug popups (turn off once it works)",
+      "default": true
+    }
   ],
   "dist": {
     "script": "index.js"
